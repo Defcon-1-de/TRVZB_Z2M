@@ -1,0 +1,68 @@
+Einbindung des TRVZB in Zigbee2MQTT / Home Assistant
+Damit der Blueprint sauber funktioniert, müssen TRVZB und MQTT‑Topic konsistent eingerichtet sein.
+​
+
+1. TRVZB in Zigbee2MQTT einbinden
+TRVZB in den Pairing‑Modus versetzen (Funk‑Symbol blinkt) und in Zigbee2MQTT „Gerät hinzufügen“ starten.
+​
+
+Nach erfolgreichem Pairing bekommt das Gerät einen Friendly Name, z.B. Wohnzimmer_TRV.
+​
+
+Diesen Friendly Name kannst du in Zigbee2MQTT unter „Einstellungen → Geräte“ anpassen; er definiert das MQTT‑Topic zigbee2mqtt/<FriendlyName>.
+​
+
+Beispiel:
+
+Friendly Name: Wohnzimmer_TRV → Basis‑Topic: zigbee2mqtt/Wohnzimmer_TRV.
+​
+
+Diesen Wert trägst du später im Blueprint als mqtt_topic_trv ein.
+
+2. MQTT‑Topic im Blueprint setzen
+In Home Assistant den Blueprint importieren und eine neue Automation/Instanz anlegen.
+​
+
+Beim Ausfüllen der Inputs:
+
+MQTT‑Topic des TRVZB = exakt das Zigbee2MQTT‑Topic des Geräts, z.B. zigbee2mqtt/Wohnzimmer_TRV (ohne /set am Ende, das übernimmt der Blueprint).
+​
+
+Falls du mehrere TRVs hast, legst du pro Heizkörper eine eigene Blueprint‑Instanz an, jeweils mit dem passenden mqtt_topic_trv (z.B. zigbee2mqtt/Bad_TRV, zigbee2mqtt/Schlafzimmer_TRV).
+​
+
+3. Home Assistant‑Entitäten prüfen
+Nach der Einbindung in Zigbee2MQTT erscheint das TRVZB in Home Assistant typischerweise als:
+
+climate.<friendlyname> (Heizkörper‑Entität)
+
+diverse Sensoren (Batterie, Ventilstellung, lokale Temperatur, ggf. Externsensor).
+​
+
+Für die Fenster‑Logik und den externen Temperatursensor:
+
+Fensterkontakte als binary_sensor (ggf. als Gruppe in HA zusammenfassen).
+
+Externer Temperatursensor als sensor mit device_class: temperature, der im Blueprint unter external_temp_sensor ausgewählt wird.
+​
+
+4. Z2M‑Seitige Optionen (empfohlen)
+In Zigbee2MQTT für das TRVZB die relevanten Optionen konfigurieren (über das Geräte‑Panel):
+
+system_mode auf auto als Standard.
+​
+
+Ggf. temperature_sensor_select auf internal lassen – der Blueprint setzt bei externem Sensor automatisch auf external.
+​
+
+frost_protection_temperature im gewünschten Bereich, falls du diese nicht ausschließlich über den Blueprint setzen möchtest.
+​
+
+Damit ist sichergestellt, dass:
+
+MQTT‑Topic und Friendly Name eindeutig sind.
+
+Der Blueprint das TRVZB über zigbee2mqtt/<FriendlyName>/set korrekt steuern kann.
+
+Fenstergruppen, Präsenz‑Schalter und externe Sensoren sauber mit dem Thermostat zusammenspielen.
+​
